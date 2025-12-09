@@ -1,0 +1,12 @@
+{
+  "name": "chaitube-backend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Shah Samin Yasar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
