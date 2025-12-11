@@ -1,11 +1,24 @@
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 dotenv.config({ path: ".env" });
+const port = process.env.PORT || 8000;
 
-connectDB();
+connectDB()
+  .then(() => {
+    app.on("error", (error) => {
+      console.log("App ERROR: ", error);
+    });
+    app.listen(port, () => {
+      console.log(`\nServer is running at port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDB connection error !! ", error);
+  });
 
-// =================== IIFE Approach ===================
+// ====== IIFE (Immediately Invoked Function Expression) Approach ======
 // import express from "express";
 // const app = express();
 
