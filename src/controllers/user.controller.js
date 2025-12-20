@@ -79,14 +79,16 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password, username } = req.body;
+  const { target, password } = req.body;
 
-  if (!email && !username) {
+  if (!target) {
     throw new ApiError(400, "Username or email is required");
   }
 
+  if (!password) throw new ApiError(400, "Password is required");
+
   const user = await User.findOne({
-    $or: [{ email }, { username }],
+    $or: [{ email: target }, { username: target }],
   });
   if (!user) throw new ApiError(404, "User does not exist");
 
@@ -97,8 +99,8 @@ const loginUser = asyncHandler(async (req, res) => {
     user?._id
   );
 
-  const { password: ip, refreshToken: irt, ...processedUser } = user;
-  console.log("PROCESSED USER:", processedUser);
+  const userObj = user.toObject();
+  const { password: ip, refreshToken: irt, ...processedUser } = userObj;
 
   const options = {
     httpOnly: true,
@@ -144,7 +146,13 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User logout successful"));
+    .json(
+      new ApiResponse(
+        200,
+        { fullname: req?.user?.fullname },
+        "User logout successful"
+      )
+    );
 });
 
 export { registerUser, loginUser, logoutUser };
