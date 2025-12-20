@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { ApiError } from "../utils/ApiError.js";
 
 const userSchema = new Schema(
   {
@@ -50,10 +51,14 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  // !next() doesn't work, throws error - async and next() don't work together, if async then no need of next()!
+  if (!this.isModified("password")) return;
 
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+  } catch (error) {
+    throw new ApiError(500, error?.message);
+  }
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
